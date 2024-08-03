@@ -2,13 +2,18 @@ const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client
 const express = require("express");
 const admin = require("firebase-admin");
 const AWS = require('aws-sdk');
-const port = 3000;
+const port = process.env.PORT || 3000;
 const app = express();
+const cors = require('cors');
 
 const secret_name = "firebaseServiceAccountKey";
 
 const client = new SecretsManagerClient({
   region: "us-east-1",
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
 
@@ -44,6 +49,8 @@ async function initializeFirebase() {
     throw error;
   }
 }
+
+app.use(cors());
 
 // Inicializar Firebase e iniciar o servidor Express
 initializeFirebase().then(() => {
