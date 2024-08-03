@@ -4,6 +4,7 @@ const admin = require("firebase-admin");
 const AWS = require('aws-sdk');
 const port = process.env.PORT || 3000;
 const app = express();
+const cors = require('cors');
 
 const secret_name = "firebaseServiceAccountKey";
 
@@ -48,6 +49,8 @@ async function initializeFirebase() {
     throw error;
   }
 }
+
+app.use(cors());
 
 // Inicializar Firebase e iniciar o servidor Express
 initializeFirebase().then(() => {
