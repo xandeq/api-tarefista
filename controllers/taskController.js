@@ -19,9 +19,12 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
+    const { text, completed, createdAt, updatedAt } = req.body;
     const newTask = {
-      text: req.body.text,
-      completed: false,
+      text,
+      completed,
+      createdAt: new Date(createdAt),
+      updatedAt: new Date(updatedAt),
     };
     const taskRef = await db.collection("tasks").add(newTask);
     res.status(201).json({ id: taskRef.id, ...newTask });
