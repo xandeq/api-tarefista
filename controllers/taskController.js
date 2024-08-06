@@ -39,6 +39,7 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
+    const { text, completed, createdAt, updatedAt } = req.body;
     const updatedTask = {
       text,
       completed,
