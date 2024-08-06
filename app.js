@@ -5,7 +5,6 @@ const AWS = require('aws-sdk');
 const port = process.env.PORT || 3000;
 const app = express();
 const cors = require('cors');
-const authRoutes = require('./routes/auth');
 
 const secret_name = "firebaseServiceAccountKey";
 
@@ -55,9 +54,10 @@ app.use(cors());
 
 // Inicializar Firebase e iniciar o servidor Express
 initializeFirebase().then(() => {
-  const routes = require("./routes/tasks");
+  const taskRoutes = require("./routes/tasks");
+  const authRoutes = require('./routes/auth');
   app.use(express.json());
-  app.use("/api", routes);
+  app.use("/api", taskRoutes);
   app.use('/api', authRoutes);
 
   app.listen(port, () => {
