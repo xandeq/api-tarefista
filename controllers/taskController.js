@@ -39,7 +39,12 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedTask = req.body;
+    const updatedTask = {
+      text,
+      completed,
+      createdAt,
+      updatedAt: new Date(updatedAt),
+    };
     await db.collection("tasks").doc(id).update(updatedTask);
     res.status(200).send("Task updated successfully");
   } catch (error) {
