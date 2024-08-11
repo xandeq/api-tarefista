@@ -1,6 +1,7 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -53,11 +54,11 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const token = jwt.sign(
-      { userId: userSnapshot.docs[0].id },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    const secretKey =
+      "803e35bff385378023866622ae38dcd03468f06ed76fbd791e180b6634370efc";
+    const token = jwt.sign({ userId: userSnapshot.docs[0].id }, secretKey, {
+      expiresIn: "1h",
+    });
 
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
