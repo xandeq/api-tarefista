@@ -58,3 +58,21 @@ exports.logoutUser = async (req, res) => {
     res.status(500).json({ message: 'Error logging out user', error: error.message });
   }
 };
+
+exports.getUserId = async (req, res) => {
+  try {
+    const token = req.headers.authorization.split('Bearer ')[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    const userId = decodedToken.uid;
+
+    res.status(200).json({ userId });
+  } catch (error) {
+    console.error("Error getting user ID:", error);
+    res.status(500).json({ message: "Error getting user ID", error: error.message });
+  }
+};
