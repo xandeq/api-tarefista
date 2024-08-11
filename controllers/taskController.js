@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.getTasks = async (req, res) => {
   try {
-    const { userId } = req.query; // Expect userId as a query parameter
+    const { userId } = req.query;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
