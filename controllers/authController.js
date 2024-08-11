@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
+const jwt = require('jsonwebtoken');
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -40,7 +41,8 @@ exports.loginUser = async (req, res) => {
     // Como o Firebase Admin SDK não fornece um método para verificar a senha diretamente,
     // você pode usar Firebase Authentication no frontend para autenticar o usuário e obter um token de ID,
     // que pode ser verificado no backend.
-
+    const token = jwt.sign({ userId: userSnapshot.docs[0].id }, 'your-secret-key', { expiresIn: '1h' });
+    res.status(200).json({ message: 'Login successful', token });
     // Enviar resposta de sucesso
     res.status(200).json({ message: 'Login successful' });
   } catch (error) {
