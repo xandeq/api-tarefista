@@ -4,15 +4,15 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.getTasks = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { tempUserId } = req.query; // Obtém o tempUserId da query string
 
-    if (!userId) {
-      return res.status(400).json({ message: "User ID is required" });
+    if (!tempUserId) {
+      return res.status(400).json({ message: "tempUserId is required" });
     }
 
     const tasksSnapshot = await db
       .collection("tasks")
-      .where("userId", "==", userId)
+      .where("tempUserId", "==", tempUserId)
       .get();
 
     const tasks = tasksSnapshot.docs.map((doc) => ({
@@ -22,7 +22,7 @@ exports.getTasks = async (req, res) => {
 
     res.status(200).json(tasks);
   } catch (error) {
-    console.error("Error getting tasks:", error); // Log the error for server-side debugging
+    console.error("Error getting tasks:", error);
     res
       .status(500)
       .json({ message: "Error getting tasks", error: error.message });
