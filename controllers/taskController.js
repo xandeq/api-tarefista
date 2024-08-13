@@ -4,8 +4,8 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.getTasks = async (req, res) => {
   try {
-    const { tempUserId } = req.query; // Obtém o tempUserId da query string
-
+    //const { tempUserId } = req.query; // Obtém o tempUserId da query string
+    const { tempUserId } = req.body;
     if (!tempUserId) {
       return res.status(400).json({ message: "tempUserId is required" });
     }
@@ -55,7 +55,6 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
-        tempUserId, // Save the temp ID for unregistered users
       };
 
       const taskRef = await db.collection("tasks").add(newTask);
