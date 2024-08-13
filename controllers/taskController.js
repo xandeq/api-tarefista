@@ -4,24 +4,51 @@ const { v4: uuidv4 } = require("uuid");
 
 exports.getTasks = async (req, res) => {
   try {
-    //const { tempUserId } = req.query; // Obtém o tempUserId da query string
-    const { tempUserId } = req.body;
-    if (!tempUserId) {
-      return res.status(400).json({ message: "tempUserId is required" });
+    // Extraindo os parâmetros userId e tempUserId da query string
+    const { userId, tempUserId } = req.query;
+
+    // Logando os valores recebidos para verificação
+    console.log("Received userId:", userId);
+    console.log("Received tempUserId:", tempUserId);
+
+    // Verifica se pelo menos um dos parâmetros foi passado
+    if (!userId && !tempUserId) {
+      console.error("Neither userId nor tempUserId was provided.");
+      return res
+        .status(400)
+        .json({ message: "User ID or Temp User ID is required" });
     }
 
-    const tasksSnapshot = await db
-      .collection("tasks")
-      .where("tempUserId", "==", tempUserId)
-      .get();
+    const tasksRef = db.collection("tasks");
+    let query;
 
+    // Construindo a query baseada nos parâmetros recebidos
+    if (userId) {
+      console.log("Querying tasks with userId");
+      query = tasksRef.where("userId", "==", userId);
+    } else if (tempUserId) {
+      console.log("Querying tasks with tempUserId");
+      query = tasksRef.where("tempUserId", "==", tempUserId);
+    }
+
+    // Executando a query e obtendo os resultados
+    const tasksSnapshot = await query.get();
+
+    // Se não houver documentos, loga a informação
+    if (tasksSnapshot.empty) {
+      console.log("No tasks found for the provided userId or tempUserId.");
+    }
+
+    // Mapeando os documentos retornados para um array de tarefas
     const tasks = tasksSnapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
 
+    // Retornando as tarefas encontradas
     res.status(200).json(tasks);
   } catch (error) {
+    // Loga o erro para depuração
     console.error("Error getting tasks:", error);
     res
       .status(500)
