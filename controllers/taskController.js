@@ -31,10 +31,11 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
-    const { text, completed, createdAt, updatedAt, userId } = req.body;
-    if (!userId) {
+    const { text, completed, createdAt, updatedAt, tempUserId } = req.body;
+
+    if (!tempUserId) {
       // Generate a unique ID for unregistered users if you plan to track them
-      const tempUserId = uuidv4();
+      tempUserId = uuidv4();
 
       const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
       const tasksSnapshot = await db
@@ -58,7 +59,7 @@ exports.addTask = async (req, res) => {
       };
 
       const taskRef = await db.collection("tasks").add(newTask);
-      return res.status(201).json({ id: taskRef.id, ...newTask });
+      return res.status(201).json({ id: taskRef.id, tempUserId, ...newTask });
     } else {
       // Regular flow for registered users
       const newTask = {
@@ -66,7 +67,7 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
-        userId, // Associate task with registered user
+        tempUserId, // Associate task with registered user
       };
 
       const taskRef = await db.collection("tasks").add(newTask);
