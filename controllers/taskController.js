@@ -62,12 +62,12 @@ exports.addTask = async (req, res) => {
 
     if (!tempUserId) {
       // Generate a unique ID for unregistered users if you plan to track them
-      tempUserId = uuidv4();
+      let tempUserIdNew = uuidv4();
 
       let today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
       let tasksSnapshot = await db
         .collection("tasks")
-        .where("tempUserId", "==", tempUserId)
+        .where("tempUserId", "==", tempUserIdNew)
         .where("createdAt", ">=", new Date(today))
         .get();
 
@@ -85,7 +85,7 @@ exports.addTask = async (req, res) => {
       };
 
       let taskRef = await db.collection("tasks").add(newTask);
-      return res.status(201).json({ id: taskRef.id, tempUserId, ...newTask });
+      return res.status(201).json({ id: taskRef.id, tempUserIdNew, ...newTask });
     } else {
       // Regular flow for registered users
       let newTask = {
