@@ -64,8 +64,8 @@ exports.addTask = async (req, res) => {
       // Generate a unique ID for unregistered users if you plan to track them
       tempUserId = uuidv4();
 
-      const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
-      const tasksSnapshot = await db
+      let today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+      let tasksSnapshot = await db
         .collection("tasks")
         .where("tempUserId", "==", tempUserId)
         .where("createdAt", ">=", new Date(today))
@@ -77,18 +77,18 @@ exports.addTask = async (req, res) => {
           .json({ message: "Task limit reached for today" });
       }
 
-      const newTask = {
+      let newTask = {
         text,
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
       };
 
-      const taskRef = await db.collection("tasks").add(newTask);
+      let taskRef = await db.collection("tasks").add(newTask);
       return res.status(201).json({ id: taskRef.id, tempUserId, ...newTask });
     } else {
       // Regular flow for registered users
-      const newTask = {
+      let newTask = {
         text,
         completed,
         createdAt: new Date(createdAt),
@@ -96,7 +96,7 @@ exports.addTask = async (req, res) => {
         tempUserId, // Associate task with registered user
       };
 
-      const taskRef = await db.collection("tasks").add(newTask);
+      let taskRef = await db.collection("tasks").add(newTask);
       return res.status(201).json({ id: taskRef.id, ...newTask });
     }
   } catch (error) {
