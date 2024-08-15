@@ -85,7 +85,7 @@ exports.addTask = async (req, res) => {
       };
 
       let taskRef = await db.collection("tasks").add(newTask);
-      return res.status(201).json({ id: taskRef.id, tempUserIdNew, ...newTask });
+      return res.status(201).json({ id: taskRef.id, tempUserId: tempUserIdNew, ...newTask });
     } else {
       // Regular flow for registered users
       let newTask = {
