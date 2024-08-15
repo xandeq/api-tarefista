@@ -58,7 +58,7 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
-    const { text, completed, createdAt, updatedAt, tempUserId } = req.body;
+    let { text, completed, createdAt, updatedAt, tempUserId } = req.body;
 
     if (!tempUserId) {
       // Generate a unique ID for unregistered users if you plan to track them
