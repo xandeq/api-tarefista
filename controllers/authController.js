@@ -2,7 +2,7 @@ const admin = require("firebase-admin");
 const db = admin.firestore();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.registerUser = async (req, res) => {
@@ -26,10 +26,26 @@ exports.registerUser = async (req, res) => {
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error registering user:", error);
-    res
-      .status(500)
-      .json({ message: "Error registering user", error: error.message });
+    console.error("Error logging in user:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || null, // Optional: include the error code if it exists
+      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+    });
+
+    // Respond with a detailed error message
+    res.status(500).json({
+      message: "Error logging in user",
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // You might want to omit this in production for security reasons
+        code: error.code || "UNKNOWN_ERROR",
+        additionalInfo:
+          error.additionalInfo || "No additional information available",
+      },
+    });
   }
 };
 
@@ -65,10 +81,27 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
-    console.error("Error logging in user:", error);
-    res
-      .status(500)
-      .json({ message: "Error logging in user", error: error.message });
+    // Log the full error object for server-side debugging
+    console.error("Error logging in user:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || null, // Optional: include the error code if it exists
+      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+    });
+
+    // Respond with a detailed error message
+    res.status(500).json({
+      message: "Error logging in user",
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // You might want to omit this in production for security reasons
+        code: error.code || "UNKNOWN_ERROR",
+        additionalInfo:
+          error.additionalInfo || "No additional information available",
+      },
+    });
   }
 };
 
@@ -77,10 +110,26 @@ exports.logoutUser = async (req, res) => {
     // Implementar lógica de logout (isso pode envolver a invalidação de tokens no lado do cliente)
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    console.error("Error logging out user:", error);
-    res
-      .status(500)
-      .json({ message: "Error logging out user", error: error.message });
+    console.error("Error logging in user:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || null, // Optional: include the error code if it exists
+      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+    });
+
+    // Respond with a detailed error message
+    res.status(500).json({
+      message: "Error logging in user",
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // You might want to omit this in production for security reasons
+        code: error.code || "UNKNOWN_ERROR",
+        additionalInfo:
+          error.additionalInfo || "No additional information available",
+      },
+    });
   }
 };
 
@@ -99,9 +148,25 @@ exports.getUserId = async (req, res) => {
 
     res.status(200).json({ userId });
   } catch (error) {
-    console.error("Error getting user ID:", error);
-    res
-      .status(500)
-      .json({ message: "Error getting user ID", error: error.message });
+    console.error("Error logging in user:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || null, // Optional: include the error code if it exists
+      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+    });
+
+    // Respond with a detailed error message
+    res.status(500).json({
+      message: "Error logging in user",
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // You might want to omit this in production for security reasons
+        code: error.code || "UNKNOWN_ERROR",
+        additionalInfo:
+          error.additionalInfo || "No additional information available",
+      },
+    });
   }
 };
