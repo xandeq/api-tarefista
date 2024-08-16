@@ -6,44 +6,39 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.registerUser = async (req, res) => {
+  console.log("Register User function called");
+
   const { email, password, displayName } = req.body;
 
   try {
-    // Hash da senha antes de criar o usuário
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log("Hashing password...");
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Criar usuário no Firebase Authentication
+    console.log("Creating Firebase user...");
     const userRecord = await admin.auth().createUser({
       email,
-      password,  // Firebase Authentication usa essa senha em texto simples para a criação do usuário
+      password,
       displayName,
     });
 
-    // Armazenar detalhes adicionais do usuário no Firestore, incluindo a senha hashada
+    console.log("Saving user to Firestore...");
     await db.collection("users").doc(userRecord.uid).set({
       email: userRecord.email,
       displayName: userRecord.displayName,
-      password: hashedPassword, // Armazena a senha hashada no Firestore
+      password: hashedPassword,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    console.log("User registered successfully");
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error registering user:", {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-      code: error.code || null, // Opcional: incluir o código de erro se existir
-      additionalInfo: error.additionalInfo || null, // Opcional: incluir qualquer outra informação relevante
-    });
-
-    // Responder com uma mensagem de erro detalhada
+    console.error("Error registering user:", error);
     res.status(500).json({
       message: "Error registering user",
       error: {
         message: error.message,
         name: error.name,
-        stack: error.stack, // Talvez você queira omitir isso em produção por razões de segurança
+        stack: error.stack,
         code: error.code || "UNKNOWN_ERROR",
         additionalInfo:
           error.additionalInfo || "No additional information available",
