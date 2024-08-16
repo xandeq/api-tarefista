@@ -3,10 +3,11 @@ const db = admin.firestore();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
-
+  const hashedPassword = await bcrypt.hash(password, saltRounds);
   try {
     // Criar usuário no Firebase Authentication
     const userRecord = await admin.auth().createUser({
@@ -19,6 +20,7 @@ exports.registerUser = async (req, res) => {
     await db.collection("users").doc(userRecord.uid).set({
       email: userRecord.email,
       displayName: userRecord.displayName,
+      password: hashedPassword,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
