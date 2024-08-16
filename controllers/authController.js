@@ -2,6 +2,7 @@ const admin = require("firebase-admin");
 const db = admin.firestore();
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const bcrypt = require('bcrypt');
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
