@@ -65,6 +65,15 @@ exports.loginUser = async (req, res) => {
 
     const userData = userSnapshot.docs[0].data();
 
+    // Log para depuração
+    console.log("Password provided by user:", password);
+    console.log("Stored hashed password:", userData.password);
+
+    // Verifique se ambos os valores estão definidos antes de prosseguir
+    if (!password || !userData.password) {
+      throw new Error("Missing data or hash for bcrypt comparison");
+    }
+
     // Compare the provided password with the hashed password stored in Firestore
     const isPasswordValid = await bcrypt.compare(password, userData.password);
 
@@ -73,30 +82,28 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const secretKey =
-      "803e35bff385378023866622ae38dcd03468f06ed76fbd791e180b6634370efc";
+    const secretKey = "seu-segredo-jwt-aqui";
     const token = jwt.sign({ userId: userSnapshot.docs[0].id }, secretKey, {
       expiresIn: "1h",
     });
 
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
-    // Log the full error object for server-side debugging
     console.error("Error logging in user:", {
       message: error.message,
       name: error.name,
       stack: error.stack,
-      code: error.code || null, // Optional: include the error code if it exists
-      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+      code: error.code || "UNKNOWN_ERROR",
+      additionalInfo:
+        error.additionalInfo || "No additional information available",
     });
 
-    // Respond with a detailed error message
     res.status(500).json({
       message: "Error logging in user",
       error: {
         message: error.message,
         name: error.name,
-        stack: error.stack, // You might want to omit this in production for security reasons
+        stack: error.stack, // Cuidado ao expor isso em produção
         code: error.code || "UNKNOWN_ERROR",
         additionalInfo:
           error.additionalInfo || "No additional information available",
