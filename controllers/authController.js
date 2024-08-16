@@ -7,40 +7,43 @@ const saltRounds = 10;
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+
   try {
+    // Hash da senha antes de criar o usuário
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     // Criar usuário no Firebase Authentication
     const userRecord = await admin.auth().createUser({
       email,
-      password,
+      password,  // Firebase Authentication usa essa senha em texto simples para a criação do usuário
       displayName,
     });
 
-    // Armazenar detalhes adicionais do usuário no Firestore
+    // Armazenar detalhes adicionais do usuário no Firestore, incluindo a senha hashada
     await db.collection("users").doc(userRecord.uid).set({
       email: userRecord.email,
       displayName: userRecord.displayName,
-      password: hashedPassword,
+      password: hashedPassword, // Armazena a senha hashada no Firestore
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error logging in user:", {
+    console.error("Error registering user:", {
       message: error.message,
       name: error.name,
       stack: error.stack,
-      code: error.code || null, // Optional: include the error code if it exists
-      additionalInfo: error.additionalInfo || null, // Optional: include any other relevant info
+      code: error.code || null, // Opcional: incluir o código de erro se existir
+      additionalInfo: error.additionalInfo || null, // Opcional: incluir qualquer outra informação relevante
     });
 
-    // Respond with a detailed error message
+    // Responder com uma mensagem de erro detalhada
     res.status(500).json({
-      message: "Error logging in user",
+      message: "Error registering user",
       error: {
         message: error.message,
         name: error.name,
-        stack: error.stack, // You might want to omit this in production for security reasons
+        stack: error.stack, // Talvez você queira omitir isso em produção por razões de segurança
         code: error.code || "UNKNOWN_ERROR",
         additionalInfo:
           error.additionalInfo || "No additional information available",
