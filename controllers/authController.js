@@ -6,22 +6,25 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.registerUser = async (req, res) => {
-  console.log("Register User function called");
-
   const { email, password, displayName } = req.body;
 
   try {
-    console.log("Hashing password...");
-    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("Iniciando processo de registro...");
 
-    console.log("Creating Firebase user...");
+    // Hash da senha
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log("Senha hash gerada");
+
+    // Criar usuário no Firebase Authentication
     const userRecord = await admin.auth().createUser({
       email,
       password,
       displayName,
     });
 
-    console.log("Saving user to Firestore...");
+    console.log("Usuário criado no Firebase Authentication:", userRecord.uid);
+
+    // Armazenar detalhes adicionais do usuário no Firestore
     await db.collection("users").doc(userRecord.uid).set({
       email: userRecord.email,
       displayName: userRecord.displayName,
@@ -29,19 +32,27 @@ exports.registerUser = async (req, res) => {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    console.log("User registered successfully");
+    console.log("Detalhes do usuário salvos no Firestore");
+
     res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
-    console.error("Error registering user:", error);
+    console.error("Erro ao registrar o usuário:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || "UNKNOWN_ERROR",
+      additionalInfo: error.additionalInfo || "No additional information available",
+    });
+
+    // Responder com uma mensagem de erro detalhada para o app
     res.status(500).json({
       message: "Error registering user",
       error: {
         message: error.message,
         name: error.name,
-        stack: error.stack,
+        stack: error.stack, // Pode omitir isso em produção
         code: error.code || "UNKNOWN_ERROR",
-        additionalInfo:
-          error.additionalInfo || "No additional information available",
+        additionalInfo: error.additionalInfo || "No additional information available",
       },
     });
   }
