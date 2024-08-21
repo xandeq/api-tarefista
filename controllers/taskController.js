@@ -38,7 +38,6 @@ exports.getTasks = async (req, res) => {
     if (tasksSnapshot.empty) {
       console.log("No tasks found for the provided userId or tempUserId.");
     }
-
     // Mapeando os documentos retornados para um array de tarefas
     const tasks = tasksSnapshot.docs.map((doc) => ({
       id: doc.id,
