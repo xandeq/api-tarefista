@@ -51,6 +51,11 @@ async function initializeFirebase() {
 }
 
 app.use(cors());
+app.use(cors({
+  origin: '*', // ou '*', para permitir de qualquer origem
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Inicializar Firebase e iniciar o servidor Express
 initializeFirebase().then(() => {
