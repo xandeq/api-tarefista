@@ -91,7 +91,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const secretKey = "803e35bff385378023866622ae38dcd03468f06ed76fbd791e180b6634370efc";
+    const secretKey = process.env.JWT_SECRET;
     const token = jwt.sign({ userId: userSnapshot.docs[0].id }, secretKey, {
       expiresIn: "1h",
     });
