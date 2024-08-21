@@ -56,7 +56,7 @@ exports.registerUser = async (req, res) => {
       },
     });
   }
-};
+};\
 
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -91,7 +91,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const secretKey = "seu-segredo-jwt-aqui";
+    const secretKey = "803e35bff385378023866622ae38dcd03468f06ed76fbd791e180b6634370efc";
     const token = jwt.sign({ userId: userSnapshot.docs[0].id }, secretKey, {
       expiresIn: "1h",
     });
