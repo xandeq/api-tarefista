@@ -66,7 +66,6 @@ initializeFirebase().then(() => {
   app.use("/api", taskRoutes);
   app.use('/api', authRoutes);
   app.use("/api", phraseRoutes);
-
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
   });
