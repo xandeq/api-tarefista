@@ -1,67 +1,43 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const fs = require('fs');
+const path = require('path');
 
 /**
- * Função para buscar frases de um autor no site O Pensador
- * @param {string} author - O nome do autor
- * @returns {JSON} - Frases do autor
+ * Função para buscar uma frase com base no dia do mês.
+ * @returns {string} - A frase correspondente ao dia do mês
  */
-async function fetchPhrases(author) {
+function fetchPhraseByDay() {
   try {
-    const formattedAuthor = author.replace(" ", "_").toLowerCase();
-    let url = `https://pensador.uol.com.br/${formattedAuthor}/`;
-    let phrases = {};
-    let count = 0;
+    // Caminho para o arquivo phrases.json
+    const phrasesPath = path.join(__dirname, 'phrases.json');
+    
+    // Ler o conteúdo do arquivo JSON
+    const phrasesData = fs.readFileSync(phrasesPath, 'utf-8');
+    
+    // Parse do JSON
+    const phrases = JSON.parse(phrasesData).phrases;
 
-    // Função para extrair frases de uma página
-    const extractPhrases = async (url) => {
-      const { data } = await axios.get(url);
-      const $ = cheerio.load(data);
+    // Obter o dia atual do mês
+    const today = new Date().getDate();
 
-      // Selecionar os elementos que contêm as frases
-      $(".frase").each((index, element) => {
-        let phraseText = $(element).text().trim();
-        if (phraseText) {
-          phrases[count] = phraseText;
-          count++;
-        }
-      });
+    // Usar o dia como índice (lembrando que o índice começa em 0)
+    const phraseIndex = (today - 1) % phrases.length;
 
-      // Verificar se há um link para a próxima página de frases
-      const nextPageLink = $(".next a").attr('href');
-      return nextPageLink ? `https://pensador.uol.com.br${nextPageLink}` : null;
-    };
-
-    // Loop para percorrer múltiplas páginas (caso existam)
-    while (url) {
-      url = await extractPhrases(url);
-    }
-
-    return phrases;
-
+    // Retornar a frase correspondente
+    return phrases[phraseIndex];
   } catch (error) {
-    console.error("Erro ao buscar frases: ", error);
-    throw new Error("Não foi possível buscar as frases.");
+    console.error("Erro ao buscar frase: ", error);
+    throw new Error("Não foi possível buscar a frase.");
   }
 }
 
 /**
- * Controlador para lidar com requisições GET para buscar frases de um autor
+ * Controlador para lidar com requisições GET para buscar uma frase
  */
 exports.getPhrases = async (req, res) => {
-  const author = req.query.author;
-
-  if (!author) {
-    return res.status(400).json({ error: "O nome do autor é obrigatório." });
-  }
-
   try {
-    const phrases = await fetchPhrases(author);
-    if (Object.keys(phrases).length === 0) {
-      return res.status(404).json({ message: "Nenhuma frase encontrada para o autor fornecido." });
-    }
-    res.status(200).json(phrases);
+    const phrase = fetchPhraseByDay();
+    res.status(200).json({ phrase });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar frases do autor." });
+    res.status(500).json({ error: "Erro ao buscar a frase." });
   }
 };
