@@ -61,9 +61,11 @@ app.use(cors({
 initializeFirebase().then(() => {
   const taskRoutes = require("./routes/tasks");
   const authRoutes = require('./routes/auth');
+  const phraseRoutes = require("./routes/phrases");
   app.use(express.json());
   app.use("/api", taskRoutes);
   app.use('/api', authRoutes);
+  app.use("/api", phraseRoutes);
 
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
