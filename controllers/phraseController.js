@@ -9,8 +9,8 @@ function fetchPhraseByDay() {
   try {
     console.log("Iniciando leitura de frases...");
 
-    // Caminho para o arquivo phrases.json
-    const phrasesPath = path.join(__dirname, 'phrases.json');
+    // Caminho para o arquivo phrases.json (na raiz do projeto)
+    const phrasesPath = path.join(__dirname, '..', 'phrases.json');
     console.log("Caminho para o arquivo phrases.json:", phrasesPath);
     
     // Ler o conteúdo do arquivo JSON
@@ -41,10 +41,8 @@ function fetchPhraseByDay() {
  * Controlador para lidar com requisições GET para buscar uma frase
  */
 exports.getPhrases = async (req, res) => {
-  console.log("Rota /phrases chamada.");
   try {
     const phrase = fetchPhraseByDay();
-    console.log("Frase retornada:", phrase);
     res.status(200).json({ phrase });
   } catch (error) {
     console.error("Erro no controlador getPhrases:", error);
