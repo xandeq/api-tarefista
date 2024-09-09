@@ -31,7 +31,7 @@ exports.addTask = async (req, res) => {
     completed = completed || false;
     createdAt = createdAt ? new Date(createdAt) : new Date();
     updatedAt = updatedAt ? new Date(updatedAt) : new Date();
-    completionDate = completionDate !== undefined ? completionDate : null;
+    completionDate = "";
     const newTask = new Task({
       text,
       completed,
@@ -56,7 +56,7 @@ exports.updateTask = async (req, res) => {
     completed = completed || false;
     createdAt = createdAt ? new Date(createdAt) : new Date();
     updatedAt = updatedAt ? new Date(updatedAt) : new Date();
-    completionDate = completionDate !== undefined ? completionDate : null;
+    completionDate = "";
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
