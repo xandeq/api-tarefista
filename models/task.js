@@ -7,6 +7,18 @@ class Task {
     this.userId = userId || null;
     this.tempUserId = tempUserId || null;
   }
+
+  toFirestore() {
+    return {
+      text: this.text,
+      completed: this.completed,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      completionDate: this.completionDate,
+      userId: this.userId,
+      tempUserId: this.tempUserId,
+    };
+  }
 }
 
 module.exports = Task;
