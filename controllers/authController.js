@@ -153,7 +153,7 @@ exports.getUserId = async (req, res) => {
     const token = req.headers.authorization.split("Bearer ")[1];
 
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized to Get User Id" });
     }
 
     // Verify JWT

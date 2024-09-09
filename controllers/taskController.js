@@ -51,7 +51,7 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    let { text, completed, createdAt, updatedAt, userId, completionDate } = req.body;
+    let { text, completed, createdAt, updatedAt, userId, completionDate, tempUserId } = req.body;
     text = text || '';
     completed = completed || false;
     createdAt = createdAt ? new Date(createdAt) : new Date();
@@ -61,7 +61,7 @@ exports.updateTask = async (req, res) => {
     const taskDoc = await taskRef.get();
 
     if (!taskDoc.exists || taskDoc.data().userId !== userId) {
-      return res.status(403).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: "Unauthorized to Update Task" });
     }
 
     const updatedTask = new Task({
@@ -87,7 +87,7 @@ exports.deleteTask = async (req, res) => {
     const taskDoc = await taskRef.get();
     
     if (!taskDoc.exists || taskDoc.data().userId !== userId) {
-      return res.status(403).json({ message: "Unauthorized" });
+      return res.status(403).json({ message: "Unauthorized to Delete Task" });
     }
 
     await taskRef.delete();
