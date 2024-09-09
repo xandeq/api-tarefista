@@ -36,7 +36,7 @@ exports.addTask = async (req, res) => {
       tempUserId: tempUserId || uuidv4(), // Generate tempUserId if not provided
     });
 
-    const taskData = newTask.toPlainObject();
+    const taskData = newTask.toFirestore();
     const taskRef = await db.collection("tasks").add(taskData);
     return res.status(201).json({ id: taskRef.id, ...newTask });
   } catch (error) {
@@ -63,7 +63,7 @@ exports.updateTask = async (req, res) => {
       updatedAt: new Date(updatedAt),
     });
 
-    await taskRef.update(updatedTask.toPlainObject());
+    await taskRef.update(updatedTask.toFirestore());
     res.status(200).send("Task updated successfully");
   } catch (error) {
     res.status(500).json({ message: "Error updating task", error: error.message });
