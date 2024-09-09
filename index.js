@@ -40,6 +40,7 @@ async function initializeFirebase() {
   try {
     const serviceAccount = await getSecret();
     admin.initializeApp({
+      ignoreUndefinedProperties: true,
       credential: admin.credential.cert(serviceAccount),
       databaseURL: "https://tarefista-default-rtdb.firebaseio.com",
     });
