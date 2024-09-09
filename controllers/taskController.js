@@ -26,8 +26,12 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
-    const { text, completed, createdAt, updatedAt, tempUserId } = req.body;
-    
+    const { text, completed, createdAt, updatedAt, tempUserId, completionDate } = req.body;
+    text = text || '';
+    completed = completed || false;
+    createdAt = createdAt ? new Date(createdAt) : new Date();
+    updatedAt = updatedAt ? new Date(updatedAt) : new Date();
+    completionDate = completionDate || null;
     const newTask = new Task({
       text,
       completed,
@@ -47,8 +51,12 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text, completed, updatedAt, userId } = req.body;
-
+    const { text, completed, updatedAt, userId, completionDate } = req.body;
+    text = text || '';
+    completed = completed || false;
+    createdAt = createdAt ? new Date(createdAt) : new Date();
+    updatedAt = updatedAt ? new Date(updatedAt) : new Date();
+    completionDate = completionDate || null;
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
