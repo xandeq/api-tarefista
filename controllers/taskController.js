@@ -51,7 +51,7 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    let { text, completed, updatedAt, userId, completionDate } = req.body;
+    let { text, completed, createdAt, updatedAt, userId, completionDate } = req.body;
     text = text || '';
     completed = completed || false;
     createdAt = createdAt ? new Date(createdAt) : new Date();
