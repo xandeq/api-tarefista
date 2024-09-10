@@ -57,13 +57,21 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
-    let { text, completed, createdAt, updatedAt, tempUserId } = req.body;
+    let {
+      text,
+      completed,
+      createdAt,
+      updatedAt,
+      tempUserId,
+      isRecurring, // Nova propriedade
+      recurrencePattern, // Nova propriedade
+      startDate, // Nova propriedade
+      endDate, // Nova propriedade
+    } = req.body;
 
     if (!tempUserId) {
-      // Generate a unique ID for unregistered users if you plan to track them
       let tempUserIdNew = uuidv4();
-
-      let today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+      let today = new Date().toISOString().split("T")[0];
       let tasksSnapshot = await db
         .collection("tasks")
         .where("tempUserId", "==", tempUserIdNew)
@@ -81,6 +89,10 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
+        isRecurring, // Adicionando recorrência
+        recurrencePattern, // Adicionando padrão de recorrência
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
       };
 
       let taskRef = await db.collection("tasks").add(newTask);
@@ -88,20 +100,23 @@ exports.addTask = async (req, res) => {
         .status(201)
         .json({ id: taskRef.id, tempUserId: tempUserIdNew, ...newTask });
     } else {
-      // Regular flow for registered users
       let newTask = {
         text,
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
-        tempUserId, // Associate task with registered user
+        tempUserId,
+        isRecurring, // Adicionando recorrência
+        recurrencePattern, // Adicionando padrão de recorrência
+        startDate: startDate ? new Date(startDate) : null,
+        endDate: endDate ? new Date(endDate) : null,
       };
 
       let taskRef = await db.collection("tasks").add(newTask);
       return res.status(201).json({ id: taskRef.id, ...newTask });
     }
   } catch (error) {
-    console.error("Error adding task:", error); // Log the error for server-side debugging
+    console.error("Error adding task:", error);
     res
       .status(500)
       .json({ message: "Error adding task", error: error.message });
@@ -111,7 +126,17 @@ exports.addTask = async (req, res) => {
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text, completed, createdAt, updatedAt, userId } = req.body;
+    const {
+      text,
+      completed,
+      createdAt,
+      updatedAt,
+      isRecurring, // Nova propriedade
+      recurrencePattern, // Nova propriedade
+      startDate, // Nova propriedade
+      endDate, // Nova propriedade
+      userId,
+    } = req.body;
 
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
@@ -125,12 +150,16 @@ exports.updateTask = async (req, res) => {
       completed,
       createdAt,
       updatedAt: new Date(updatedAt),
+      isRecurring, // Incluindo recorrência
+      recurrencePattern, // Incluindo padrão de recorrência
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
     };
 
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
   } catch (error) {
-    console.error("Error updating task:", error); // Log the error for server-side debugging
+    console.error("Error updating task:", error);
     res
       .status(500)
       .json({ message: "Error updating task", error: error.message });
