@@ -177,7 +177,7 @@ exports.updateTask = async (req, res) => {
         ? convertFirestoreTimestampToDate(endDate)
         : convertFirestoreTimestampToDate(taskDoc.data().endDate),
     };
-
+    console.log("updatedTask", updatedTask);
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
   } catch (error) {
