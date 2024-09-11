@@ -124,6 +124,14 @@ exports.addTask = async (req, res) => {
   }
 };
 
+function convertFirestoreTimestampToDate(timestamp) {
+  if (timestamp && timestamp._seconds && timestamp._nanoseconds) {
+    return new Date(
+      timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000
+    );
+  }
+  return null;
+}
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -144,15 +152,6 @@ exports.updateTask = async (req, res) => {
 
     if (!taskDoc.exists || taskDoc.data().userId !== userId) {
       return res.status(403).json({ message: "Unauthorized" });
-    }
-
-    function convertFirestoreTimestampToDate(timestamp) {
-      if (timestamp && timestamp._seconds && timestamp._nanoseconds) {
-        return new Date(
-          timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000
-        );
-      }
-      return null;
     }
 
     const updatedTask = {
