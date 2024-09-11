@@ -146,15 +146,36 @@ exports.updateTask = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    function convertFirestoreTimestampToDate(timestamp) {
+      if (timestamp && timestamp._seconds && timestamp._nanoseconds) {
+        return new Date(
+          timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000
+        );
+      }
+      return null;
+    }
+
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      createdAt: createdAt ? new Date(createdAt) : taskDoc.data().createdAt,
-      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
-      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring, // Check for undefined
-      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern, // Check for undefined
-      startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
-      endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
+      createdAt: createdAt
+        ? convertFirestoreTimestampToDate(createdAt)
+        : convertFirestoreTimestampToDate(taskDoc.data().createdAt),
+      updatedAt: updatedAt
+        ? convertFirestoreTimestampToDate(updatedAt)
+        : new Date(),
+      isRecurring:
+        isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      recurrencePattern:
+        recurrencePattern !== undefined
+          ? recurrencePattern
+          : taskDoc.data().recurrencePattern,
+      startDate: startDate
+        ? convertFirestoreTimestampToDate(startDate)
+        : convertFirestoreTimestampToDate(taskDoc.data().startDate),
+      endDate: endDate
+        ? convertFirestoreTimestampToDate(endDate)
+        : convertFirestoreTimestampToDate(taskDoc.data().endDate),
     };
 
     await taskRef.update(updatedTask);
