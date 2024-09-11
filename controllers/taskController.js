@@ -1,6 +1,7 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 const { v4: uuidv4 } = require("uuid");
+const { Task } = require("../models/task");
 
 exports.getTasks = async (req, res) => {
   try {
@@ -146,14 +147,14 @@ exports.updateTask = async (req, res) => {
     }
 
     const updatedTask = {
-      text,
-      completed,
-      createdAt,
-      updatedAt: new Date(updatedAt),
-      isRecurring, // Incluindo recorrência
-      recurrencePattern, // Incluindo padrão de recorrência
-      startDate: startDate ? new Date(startDate) : null,
-      endDate: endDate ? new Date(endDate) : null,
+      text: text !== undefined ? text : taskDoc.data().text,
+      completed: completed !== undefined ? completed : taskDoc.data().completed,
+      createdAt: createdAt ? new Date(createdAt) : taskDoc.data().createdAt,
+      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
+      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring, // Check for undefined
+      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern, // Check for undefined
+      startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
+      endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
     };
 
     await taskRef.update(updatedTask);
