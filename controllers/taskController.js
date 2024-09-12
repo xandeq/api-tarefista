@@ -64,10 +64,10 @@ exports.addTask = async (req, res) => {
       createdAt,
       updatedAt,
       tempUserId,
-      isRecurring, // Nova propriedade
-      recurrencePattern, // Nova propriedade
-      startDate, // Nova propriedade
-      endDate, // Nova propriedade
+      isRecurring,
+      recurrencePattern,
+      startDate,
+      endDate,
     } = req.body;
 
     if (!tempUserId) {
@@ -90,11 +90,14 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
-        isRecurring, // Adicionando recorrência
-        recurrencePattern, // Adicionando padrão de recorrência
+        isRecurring,
+        recurrencePattern,
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
       };
+
+      // Log the task being created
+      console.log("Creating new task:", newTask);
 
       let taskRef = await db.collection("tasks").add(newTask);
       return res
@@ -107,11 +110,14 @@ exports.addTask = async (req, res) => {
         createdAt: new Date(createdAt),
         updatedAt: new Date(updatedAt),
         tempUserId,
-        isRecurring, // Adicionando recorrência
-        recurrencePattern, // Adicionando padrão de recorrência
+        isRecurring,
+        recurrencePattern,
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
       };
+
+      // Log the task being created
+      console.log("Creating new task with tempUserId:", newTask);
 
       let taskRef = await db.collection("tasks").add(newTask);
       return res.status(201).json({ id: taskRef.id, ...newTask });
@@ -151,22 +157,20 @@ exports.updateTask = async (req, res) => {
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
-    // Verificar se o documento existe
     if (!taskDoc.exists) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Verificar se o userId é necessário para validação
     if (taskDoc.data().userId && taskDoc.data().userId !== userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
-      createdAt: convertFirestoreTimestampToDate(taskToEdit?.createdAt),
-      updatedAt: convertFirestoreTimestampToDate(taskToEdit?.updatedAt),
-      startDate: convertFirestoreTimestampToDate(taskToEdit?.startDate),
-      endDate: convertFirestoreTimestampToDate(taskToEdit?.endDate),
+      createdAt: convertFirestoreTimestampToDate(createdAt),
+      updatedAt: new Date(), // always updating the timestamp
+      startDate: convertFirestoreTimestampToDate(startDate),
+      endDate: convertFirestoreTimestampToDate(endDate),
       completed: completed !== undefined ? completed : taskDoc.data().completed,
       isRecurring:
         isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
@@ -176,10 +180,8 @@ exports.updateTask = async (req, res) => {
           : taskDoc.data().recurrencePattern,
     };
 
-    // Remover campos indefinidos
-    Object.keys(updatedTask).forEach(
-      (key) => updatedTask[key] === undefined && delete updatedTask[key]
-    );
+    // Log the task being updated
+    console.log("Updating task with ID:", id, "with data:", updatedTask);
 
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
