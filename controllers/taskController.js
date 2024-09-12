@@ -150,11 +150,7 @@ exports.updateTask = async (req, res) => {
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
-    if (!taskDoc.exists) {
-      return res.status(404).json({ message: "Task not found" });
-    }
-
-    if ((userId && taskDoc.data().userId !== userId) || (!userId && taskDoc.data().userId)) {
+    if (!taskDoc.exists || taskDoc.data().userId !== userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
@@ -162,25 +158,21 @@ exports.updateTask = async (req, res) => {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
       createdAt: createdAt
-        ? convertFirestoreTimestampToDate(createdAt)
-        : convertFirestoreTimestampToDate(taskDoc.data().createdAt),
-      updatedAt: updatedAt
-        ? convertFirestoreTimestampToDate(updatedAt)
-        : new Date(),
+        ? new Date(createdAt)
+        : new Date(taskDoc.data().createdAt._seconds * 1000),
+      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
       isRecurring:
         isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
-      recurrencePattern:
-        recurrencePattern !== undefined
-          ? recurrencePattern
-          : taskDoc.data().recurrencePattern,
-      startDate: startDate
-        ? convertFirestoreTimestampToDate(startDate)
-        : convertFirestoreTimestampToDate(taskDoc.data().startDate),
-      endDate: endDate
-        ? convertFirestoreTimestampToDate(endDate)
-        : convertFirestoreTimestampToDate(taskDoc.data().endDate),
+      startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
+      endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
+      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
     };
-    console.log("updatedTask", updatedTask);
+
+    // Remove campos com valor undefined
+    Object.keys(updatedTask).forEach(
+      (key) => updatedTask[key] === undefined && delete updatedTask[key]
+    );
+
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
   } catch (error) {
