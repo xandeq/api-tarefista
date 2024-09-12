@@ -132,7 +132,6 @@ function convertFirestoreTimestampToDate(timestamp) {
   }
   return null;
 }
-
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -141,21 +140,24 @@ exports.updateTask = async (req, res) => {
       completed,
       createdAt,
       updatedAt,
-      isRecurring, // Nova propriedade
-      recurrencePattern, // Nova propriedade
-      startDate, // Nova propriedade
-      endDate, // Nova propriedade
+      isRecurring,
+      recurrencePattern,
+      startDate,
+      endDate,
       userId,
     } = req.body;
 
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
-    if (!taskDoc.exists || taskDoc.data().userId !== userId) {
+    if (!taskDoc.exists) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    if ((userId && taskDoc.data().userId !== userId) || (!userId && taskDoc.data().userId)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    // Certifique-se de que as datas sejam convertidas corretamente antes de atualizá-las no Firestore
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
@@ -178,7 +180,6 @@ exports.updateTask = async (req, res) => {
         ? convertFirestoreTimestampToDate(endDate)
         : convertFirestoreTimestampToDate(taskDoc.data().endDate),
     };
-
     console.log("updatedTask", updatedTask);
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
