@@ -150,25 +150,28 @@ exports.updateTask = async (req, res) => {
     const taskRef = db.collection("tasks").doc(id);
     const taskDoc = await taskRef.get();
 
-    if (!taskDoc.exists || taskDoc.data().userId !== userId) {
+    // Verificar se o documento existe
+    if (!taskDoc.exists) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Verificar se o userId é necessário para validação
+    if (taskDoc.data().userId && taskDoc.data().userId !== userId) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      createdAt: createdAt
-        ? new Date(createdAt)
-        : new Date(taskDoc.data().createdAt._seconds * 1000),
+      createdAt: createdAt ? new Date(createdAt) : new Date(taskDoc.data().createdAt._seconds * 1000),
       updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
-      isRecurring:
-        isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
       startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
       endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
-      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
     };
 
-    // Remove campos com valor undefined
+    // Remover campos indefinidos
     Object.keys(updatedTask).forEach(
       (key) => updatedTask[key] === undefined && delete updatedTask[key]
     );
@@ -177,11 +180,10 @@ exports.updateTask = async (req, res) => {
     res.status(200).send("Task updated successfully");
   } catch (error) {
     console.error("Error updating task:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating task", error: error.message });
+    res.status(500).json({ message: "Error updating task", error: error.message });
   }
 };
+
 
 exports.deleteTask = async (req, res) => {
   try {
