@@ -132,6 +132,7 @@ function convertFirestoreTimestampToDate(timestamp) {
   }
   return null;
 }
+
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -162,15 +163,19 @@ exports.updateTask = async (req, res) => {
 
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
+      createdAt: convertFirestoreTimestampToDate(taskToEdit?.createdAt),
+      updatedAt: convertFirestoreTimestampToDate(taskToEdit?.updatedAt),
+      startDate: convertFirestoreTimestampToDate(taskToEdit?.startDate),
+      endDate: convertFirestoreTimestampToDate(taskToEdit?.endDate),
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      createdAt: createdAt ? convertFirestoreTimestampToDate(createdAt) : taskDoc.data().createdAt,
-      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
-      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
-      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
-      startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
-      endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
+      isRecurring:
+        isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      recurrencePattern:
+        recurrencePattern !== undefined
+          ? recurrencePattern
+          : taskDoc.data().recurrencePattern,
     };
-    
+
     // Remover campos indefinidos
     Object.keys(updatedTask).forEach(
       (key) => updatedTask[key] === undefined && delete updatedTask[key]
