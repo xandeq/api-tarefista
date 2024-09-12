@@ -163,8 +163,8 @@ exports.updateTask = async (req, res) => {
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      createdAt: createdAt ? new Date(createdAt) : taskDoc.data().createdAt.toDate(),  // Corrigido
-      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),  // Nova data de atualização
+      createdAt: createdAt ? convertFirestoreTimestampToDate(createdAt) : taskDoc.data().createdAt,
+      updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
       isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
       recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
       startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
