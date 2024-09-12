@@ -180,6 +180,11 @@ exports.updateTask = async (req, res) => {
           : taskDoc.data().recurrencePattern,
     };
 
+    // Remover qualquer chave que tenha valor undefined antes de atualizar o Firestore
+    Object.keys(updatedTask).forEach(
+      (key) => updatedTask[key] === undefined && delete updatedTask[key]
+    );
+
     // Log the task being updated
     console.log("Updating task with ID:", id, "with data:", updatedTask);
 
