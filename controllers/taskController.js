@@ -163,10 +163,16 @@ exports.updateTask = async (req, res) => {
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      createdAt: createdAt ? new Date(createdAt) : new Date(taskDoc.data().createdAt._seconds * 1000),
+      createdAt: createdAt
+        ? new Date(createdAt)
+        : taskDoc.data().createdAt.toDate(),
       updatedAt: updatedAt ? new Date(updatedAt) : new Date(),
-      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
-      recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
+      isRecurring:
+        isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      recurrencePattern:
+        recurrencePattern !== undefined
+          ? recurrencePattern
+          : taskDoc.data().recurrencePattern,
       startDate: startDate ? new Date(startDate) : taskDoc.data().startDate,
       endDate: endDate ? new Date(endDate) : taskDoc.data().endDate,
     };
@@ -180,10 +186,11 @@ exports.updateTask = async (req, res) => {
     res.status(200).send("Task updated successfully");
   } catch (error) {
     console.error("Error updating task:", error);
-    res.status(500).json({ message: "Error updating task", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating task", error: error.message });
   }
 };
-
 
 exports.deleteTask = async (req, res) => {
   try {
