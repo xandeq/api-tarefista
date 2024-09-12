@@ -132,6 +132,7 @@ function convertFirestoreTimestampToDate(timestamp) {
   }
   return null;
 }
+
 exports.updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -154,6 +155,7 @@ exports.updateTask = async (req, res) => {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
+    // Certifique-se de que as datas sejam convertidas corretamente antes de atualizá-las no Firestore
     const updatedTask = {
       text: text !== undefined ? text : taskDoc.data().text,
       completed: completed !== undefined ? completed : taskDoc.data().completed,
@@ -176,6 +178,7 @@ exports.updateTask = async (req, res) => {
         ? convertFirestoreTimestampToDate(endDate)
         : convertFirestoreTimestampToDate(taskDoc.data().endDate),
     };
+
     console.log("updatedTask", updatedTask);
     await taskRef.update(updatedTask);
     res.status(200).send("Task updated successfully");
