@@ -89,8 +89,8 @@ exports.addTask = async (req, res) => {
       let newTask = {
         text,
         completed,
-        createdAt: new Date(createdAt),
-        updatedAt: new Date(updatedAt),
+        createdAt: validCreatedAt,
+        updatedAt: validUpdatedAt,
         tempUserId,
         isRecurring,
         recurrencePattern,
