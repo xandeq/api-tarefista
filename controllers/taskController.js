@@ -55,11 +55,11 @@ exports.getTasks = async (req, res) => {
 exports.addTask = async (req, res) => {
   try {
     let { text, completed, createdAt, updatedAt, tempUserId, isRecurring, recurrencePattern, startDate, endDate } = req.body;
-    
+
     const validCreatedAt = isValidDate(new Date(createdAt)) ? new Date(createdAt) : admin.firestore.Timestamp.now();
     const validUpdatedAt = isValidDate(new Date(updatedAt)) ? new Date(updatedAt) : admin.firestore.Timestamp.now();
-    const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : new Date("1970-01-01T00:00:00Z");
-    const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : new Date("1970-01-01T00:00:00Z");
+    const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : new Date('1970-01-01T00:00:00Z');
+    const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : new Date('1970-01-01T00:00:00Z');
 
     if (!tempUserId) {
       let tempUserIdNew = uuidv4();
@@ -75,7 +75,8 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: validCreatedAt,
         updatedAt: validUpdatedAt,
-        isRecurring,
+        isRecurring: isRecurring !== undefined ? isRecurring : false,
+        recurrencePattern: recurrencePattern || '',
         recurrencePattern,
         startDate: validStartDate,
         endDate: validEndDate,
@@ -93,8 +94,8 @@ exports.addTask = async (req, res) => {
         createdAt: validCreatedAt,
         updatedAt: validUpdatedAt,
         tempUserId,
-        isRecurring,
-        recurrencePattern,
+        isRecurring: isRecurring !== undefined ? isRecurring : false,
+        recurrencePattern: recurrencePattern || '',
         startDate: validStartDate,
         endDate: validEndDate,
       };
