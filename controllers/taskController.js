@@ -58,8 +58,8 @@ exports.addTask = async (req, res) => {
 
     const validCreatedAt = isValidDate(new Date(createdAt)) ? new Date(createdAt) : admin.firestore.Timestamp.now();
     const validUpdatedAt = isValidDate(new Date(updatedAt)) ? new Date(updatedAt) : admin.firestore.Timestamp.now();
-    const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : new Date('1970-01-01T00:00:00Z');
-    const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : new Date('1970-01-01T00:00:00Z');
+    const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : null;
+    const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : null;
 
     if (!tempUserId) {
       let tempUserIdNew = uuidv4();
@@ -95,7 +95,7 @@ exports.addTask = async (req, res) => {
         updatedAt: validUpdatedAt,
         tempUserId,
         isRecurring: isRecurring !== undefined ? isRecurring : false,
-        recurrencePattern: recurrencePattern || '',
+        recurrencePattern: recurrencePattern || null,
         startDate: validStartDate,
         endDate: validEndDate,
       };
