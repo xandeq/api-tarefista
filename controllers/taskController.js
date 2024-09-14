@@ -55,10 +55,11 @@ exports.getTasks = async (req, res) => {
 exports.addTask = async (req, res) => {
   try {
     let { text, completed, createdAt, updatedAt, tempUserId, isRecurring, recurrencePattern, startDate, endDate } = req.body;
-    // Valida o campo createdAt
+    
     const validCreatedAt = isValidDate(new Date(createdAt)) ? new Date(createdAt) : admin.firestore.Timestamp.now();
-    // Valida o campo updatedAt
     const validUpdatedAt = isValidDate(new Date(updatedAt)) ? new Date(updatedAt) : admin.firestore.Timestamp.now();
+    const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : new Date("1970-01-01T00:00:00Z");
+    const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : new Date("1970-01-01T00:00:00Z");
 
     if (!tempUserId) {
       let tempUserIdNew = uuidv4();
@@ -76,8 +77,8 @@ exports.addTask = async (req, res) => {
         updatedAt: validUpdatedAt,
         isRecurring,
         recurrencePattern,
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
+        startDate: validStartDate,
+        endDate: validEndDate,
       };
 
       // Log the task being created
@@ -94,8 +95,8 @@ exports.addTask = async (req, res) => {
         tempUserId,
         isRecurring,
         recurrencePattern,
-        startDate: startDate ? new Date(startDate) : null,
-        endDate: endDate ? new Date(endDate) : null,
+        startDate: validStartDate,
+        endDate: validEndDate,
       };
 
       // Log the task being created
