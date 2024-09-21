@@ -95,7 +95,7 @@ exports.addTask = async (req, res) => {
         updatedAt: validUpdatedAt,
         tempUserId,
         isRecurring: isRecurring !== undefined ? isRecurring : false,
-        recurrencePattern: recurrencePattern || null,
+        recurrencePattern: recurrencePattern || '',
         startDate: validStartDate,
         endDate: validEndDate,
       };
