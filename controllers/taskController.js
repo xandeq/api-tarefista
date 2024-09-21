@@ -95,7 +95,7 @@ exports.addTask = async (req, res) => {
         updatedAt: validUpdatedAt,
         tempUserId,
         isRecurring: isRecurring !== undefined ? isRecurring : false,
-        recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : '',
+        recurrencePattern: recurrencePattern != undefined ? recurrencePattern : '',
         startDate: validStartDate,
         endDate: validEndDate,
       };
@@ -144,7 +144,7 @@ exports.updateTask = async (req, res) => {
       startDate: convertFirestoreTimestampToDate(startDate),
       endDate: convertFirestoreTimestampToDate(endDate),
       completed: completed !== undefined ? completed : taskDoc.data().completed,
-      isRecurring: isRecurring !== undefined ? isRecurring : taskDoc.data().isRecurring,
+      isRecurring: isRecurring != undefined ? isRecurring : taskDoc.data().isRecurring,
       recurrencePattern: recurrencePattern !== undefined ? recurrencePattern : taskDoc.data().recurrencePattern,
     };
 
