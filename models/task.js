@@ -13,16 +13,16 @@ class Task {
     endDate        // Adicionando data de término da recorrência
   }) {
     this.text = text || "";
-    this.completed = completed || false;
-    this.createdAt = createdAt ? new Date(createdAt) : new Date();
-    this.updatedAt = updatedAt ? new Date(updatedAt) : new Date();
+    this.completed = completed !== undefined ? completed : false;
+    this.createdAt = createdAt !== undefined ? new Date(createdAt) : new Date();
+    this.updatedAt = updatedAt !== undefined ? new Date(updatedAt) : new Date();
     this.userId = userId || null;
     this.tempUserId = tempUserId || null;
     this.completionDate = completionDate !== undefined ? completionDate : null;
-    this.isRecurring = isRecurring || false;   // Definir padrão
-    this.recurrencePattern = recurrencePattern || null; // Definir padrão
-    this.startDate = startDate ? new Date(startDate) : null;
-    this.endDate = endDate ? new Date(endDate) : null;
+    this.isRecurring = isRecurring !== undefined ? isRecurring : false;   // Definir padrão
+    this.recurrencePattern = recurrencePattern !== undefined ? recurrencePattern : ''; // Definir padrão
+    this.startDate = startDate !== undefined ? new Date(startDate) : null;
+    this.endDate = endDate !== undefined ? new Date(endDate) : null;
   }
 
   toFirestore() {
