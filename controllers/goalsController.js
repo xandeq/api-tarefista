@@ -6,7 +6,7 @@ exports.addGoal = async (req, res) => {
     const { text, periodicity } = req.body;
 
     if (!text || !periodicity) {
-      return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+      return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
     }
 
     const goalData = {
@@ -19,12 +19,29 @@ exports.addGoal = async (req, res) => {
     const newGoalRef = await admin.firestore().collection('goals').add(goalData);
 
     res.status(200).json({
-      message: "Meta adicionada com sucesso",
+      message: 'Meta adicionada com sucesso',
       id: newGoalRef.id,
     });
   } catch (error) {
-    console.error("Erro ao adicionar meta:", error);
-    res.status(500).json({ message: "Erro ao adicionar meta" });
+    console.error('Erro ao registrar o usuário:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || 'UNKNOWN_ERROR',
+      additionalInfo: error.additionalInfo || 'No additional information available',
+    });
+
+    // Responder com uma mensagem de erro detalhada para o app
+    res.status(500).json({
+      message: 'Error registering user',
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // Pode omitir isso em produção
+        code: error.code || 'UNKNOWN_ERROR',
+        additionalInfo: error.additionalInfo || 'No additional information available',
+      },
+    });
   }
 };
 
@@ -33,13 +50,13 @@ exports.getGoals = async (req, res) => {
   try {
     const goalsRef = admin.firestore().collection('goals');
     const snapshot = await goalsRef.get();
-    
+
     if (snapshot.empty) {
-      return res.status(404).json({ message: "Nenhuma meta encontrada." });
+      return res.status(404).json({ message: 'Nenhuma meta encontrada.' });
     }
 
     const goals = [];
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       goals.push({
         id: doc.id,
         ...doc.data(),
@@ -48,7 +65,24 @@ exports.getGoals = async (req, res) => {
 
     res.status(200).json(goals);
   } catch (error) {
-    console.error("Erro ao buscar metas:", error);
-    res.status(500).json({ message: "Erro ao buscar metas" });
+    console.error('Erro ao registrar o usuário:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || 'UNKNOWN_ERROR',
+      additionalInfo: error.additionalInfo || 'No additional information available',
+    });
+
+    // Responder com uma mensagem de erro detalhada para o app
+    res.status(500).json({
+      message: 'Error registering user',
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // Pode omitir isso em produção
+        code: error.code || 'UNKNOWN_ERROR',
+        additionalInfo: error.additionalInfo || 'No additional information available',
+      },
+    });
   }
 };
