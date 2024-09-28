@@ -3,25 +3,21 @@ const admin = require('firebase-admin');
 // Função para adicionar metas no Firebase
 exports.addGoal = async (req, res) => {
   try {
-    const { text, periodicity } = req.body;
+    const { text, periodicity, userId } = req.body;
 
-    if (!text || !periodicity) {
-      return res.status(400).json({ message: 'Todos os campos são obrigatórios' });
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const goalData = {
+    const newGoal = {
       text,
       periodicity,
+      userId, // Inclui o userId na meta
       createdAt: new Date(),
     };
 
-    // Salvando a meta no Firebase
-    const newGoalRef = await admin.firestore().collection('goals').add(goalData);
-
-    res.status(200).json({
-      message: 'Meta adicionada com sucesso',
-      id: newGoalRef.id,
-    });
+    const goalRef = await db.collection('goals').add(newGoal);
+    res.status(201).json({ id: goalRef.id, ...newGoal });
   } catch (error) {
     console.error('Erro ao registrar o usuário:', {
       message: error.message,
@@ -48,20 +44,18 @@ exports.addGoal = async (req, res) => {
 // Função para obter metas do Firebase
 exports.getGoals = async (req, res) => {
   try {
-    const goalsRef = admin.firestore().collection('goals');
-    const snapshot = await goalsRef.get();
+    const { userId } = req.query;
 
-    if (snapshot.empty) {
-      return res.status(404).json({ message: 'Nenhuma meta encontrada.' });
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
     }
 
-    const goals = [];
-    snapshot.forEach((doc) => {
-      goals.push({
-        id: doc.id,
-        ...doc.data(),
-      });
-    });
+    const goalsSnapshot = await db.collection('goals').where('userId', '==', userId).get();
+
+    const goals = goalsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
 
     res.status(200).json(goals);
   } catch (error) {
