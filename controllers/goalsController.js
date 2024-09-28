@@ -1,4 +1,5 @@
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
+const db = admin.firestore();
 
 // Função para adicionar metas no Firebase
 exports.addGoal = async (req, res) => {
@@ -47,10 +48,10 @@ exports.getGoals = async (req, res) => {
     const { userId } = req.query;
 
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
+      return res.status(400).json({ message: "User ID is required" });
     }
 
-    const goalsSnapshot = await db.collection('goals').where('userId', '==', userId).get();
+    const goalsSnapshot = await db.collection("goals").where("userId", "==", userId).get();
 
     const goals = goalsSnapshot.docs.map((doc) => ({
       id: doc.id,
