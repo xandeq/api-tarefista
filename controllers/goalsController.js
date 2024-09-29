@@ -18,6 +18,8 @@ exports.addGoal = async (req, res) => {
     };
 
     const goalRef = await db.collection('goals').add(newGoal);
+    console.log('Goal added with ID:', goalRef.id);
+    console.log('Goal Ref:', goalRef);
     res.status(201).json({ id: goalRef.id, ...newGoal });
   } catch (error) {
     console.error('Erro ao registrar o usuário:', {
