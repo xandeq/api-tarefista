@@ -44,6 +44,52 @@ exports.addGoal = async (req, res) => {
   }
 };
 
+// Função para deletar metas do Firebase
+exports.deleteGoal = async (req, res) => {
+  try {
+    const { goalId } = req.params;
+
+    if (!goalId) {
+      return res.status(400).json({ message: "Goal ID is required" });
+    }
+
+    const goalRef = db.collection('goals').doc(goalId);
+    
+    // Verifica se a meta existe
+    const doc = await goalRef.get();
+    if (!doc.exists) {
+      return res.status(404).json({ message: "Goal not found" });
+    }
+
+    // Deleta a meta
+    await goalRef.delete();
+    console.log(`Goal with ID ${goalId} deleted successfully`);
+    
+    res.status(200).json({ message: "Goal deleted successfully" });
+  } catch (error) {
+    console.error('Erro ao deletar a meta:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      code: error.code || 'UNKNOWN_ERROR',
+      additionalInfo: error.additionalInfo || 'No additional information available',
+    });
+
+    // Responder com uma mensagem de erro detalhada para o app
+    res.status(500).json({
+      message: 'Error deleting goal',
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack, // Pode omitir isso em produção
+        code: error.code || 'UNKNOWN_ERROR',
+        additionalInfo: error.additionalInfo || 'No additional information available',
+      },
+    });
+  }
+};
+
+
 // Função para obter metas do Firebase
 exports.getGoals = async (req, res) => {
   try {
