@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const db = admin.firestore();
 const { v4: uuidv4 } = require('uuid');
-const { Task } = require('../models/task');
+const Task = require('../models/task');
 
 exports.getTasks = async (req, res) => {
   try {
@@ -54,14 +54,14 @@ exports.getTasks = async (req, res) => {
 
 exports.addTask = async (req, res) => {
   try {
-    let { text, completed, createdAt, updatedAt, tempUserId, isRecurring, recurrencePattern, startDate, endDate } = req.body;
+    let { text, completed, createdAt, updatedAt, tempUserId, userId, isRecurring, recurrencePattern, startDate, endDate } = req.body;
 
     const validCreatedAt = isValidDate(new Date(createdAt)) ? new Date(createdAt) : admin.firestore.Timestamp.now();
     const validUpdatedAt = isValidDate(new Date(updatedAt)) ? new Date(updatedAt) : admin.firestore.Timestamp.now();
     const validStartDate = isValidDate(new Date(startDate)) ? new Date(startDate) : null;
     const validEndDate = isValidDate(new Date(endDate)) ? new Date(endDate) : null;
 
-    if (!tempUserId) {
+    if (!tempUserId && !userId) {
       let tempUserIdNew = uuidv4();
       let today = new Date().toISOString().split('T')[0];
       let tasksSnapshot = await db.collection('tasks').where('tempUserId', '==', tempUserIdNew).where('createdAt', '>=', new Date(today)).get();
@@ -77,7 +77,6 @@ exports.addTask = async (req, res) => {
         updatedAt: validUpdatedAt,
         isRecurring: isRecurring !== undefined ? isRecurring : false,
         recurrencePattern: recurrencePattern || '',
-        recurrencePattern,
         startDate: validStartDate,
         endDate: validEndDate,
       };
@@ -93,15 +92,19 @@ exports.addTask = async (req, res) => {
         completed,
         createdAt: validCreatedAt,
         updatedAt: validUpdatedAt,
-        tempUserId,
+        tempUserId: tempUserId || null,
+        userId: userId || null,
         isRecurring: isRecurring !== undefined ? isRecurring : false,
         recurrencePattern: recurrencePattern != undefined ? recurrencePattern : '',
         startDate: validStartDate,
         endDate: validEndDate,
       };
 
+      // Remove undefined keys
+      Object.keys(newTask).forEach(key => newTask[key] === undefined && delete newTask[key]);
+
       // Log the task being created
-      console.log('Creating new task with tempUserId:', newTask);
+      console.log('Creating new task (User/Temp):', newTask);
 
       let taskRef = await db.collection('tasks').add(newTask);
       return res.status(201).json({ id: taskRef.id, ...newTask });

@@ -5,14 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "babel src -d dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.743.0",
     "@aws-sdk/client-secrets-manager": "^3.623.0",
-    "aws-sdk": "^2.1666.0",
+    "@logtail/node": "^0.5.5",
+    "@logtail/winston": "^0.5.5",
+    "aws-sdk": "^2.1692.0",
     "aws-serverless-express": "^3.4.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
@@ -22,7 +26,12 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "firebase-admin": "^12.3.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "tslint": "^6.1.3"

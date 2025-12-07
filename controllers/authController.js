@@ -3,6 +3,7 @@ const db = admin.firestore();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
+const JWT_SECRET="93c75499d1c2e0b79f85fdc749f81bc14a95518ebb79ebee3e20eab0e48565a4";
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -90,8 +91,10 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT
-    const secretKey = process.env.JWT_SECRET;
-    const token = jwt.sign({ userId: userSnapshot.docs[0].id }, secretKey, {
+    if (!JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is not set');
+    }
+    const token = jwt.sign({ userId: userSnapshot.docs[0].id }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -157,7 +160,7 @@ exports.getUserId = async (req, res) => {
     }
 
     // Verify JWT
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, JWT_SECRET);
 
     const userId = decodedToken.userId;
 
