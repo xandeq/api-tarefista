@@ -3,7 +3,9 @@ const db = admin.firestore();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const JWT_SECRET="93c75499d1c2e0b79f85fdc749f81bc14a95518ebb79ebee3e20eab0e48565a4";
+// O segredo do JWT NUNCA deve ser versionado: vem exclusivamente do ambiente.
+// A validacao explicita de boot fica em index.js (falha rapida se ausente).
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.registerUser = async (req, res) => {
   const { email, password, displayName } = req.body;
@@ -160,6 +162,9 @@ exports.getUserId = async (req, res) => {
     }
 
     // Verify JWT
+    if (!JWT_SECRET) {
+      throw new Error("JWT_SECRET environment variable is not set");
+    }
     const decodedToken = jwt.verify(token, JWT_SECRET);
 
     const userId = decodedToken.userId;

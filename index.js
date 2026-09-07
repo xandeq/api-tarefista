@@ -1,3 +1,16 @@
+require("dotenv").config();
+
+// Falha explicita no boot se um segredo obrigatorio nao estiver no ambiente.
+const REQUIRED_ENV_VARS = ["JWT_SECRET"];
+const missingEnvVars = REQUIRED_ENV_VARS.filter((name) => !process.env[name]);
+if (missingEnvVars.length > 0) {
+  console.error(
+    `[boot] Variaveis de ambiente obrigatorias ausentes: ${missingEnvVars.join(", ")}. ` +
+      "Configure-as (Heroku config vars / .env local a partir de .env.example) antes de subir a API."
+  );
+  process.exit(1);
+}
+
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager");
 const express = require("express");
 const admin = require("firebase-admin");
@@ -34,7 +47,7 @@ async function getSecret() {
     throw error;
   }
 
-  console.log("Secret retrieved: ", response.SecretString);
+  // NUNCA logar response.SecretString: contem a chave privada do service account do Firebase.
   const secretObject = JSON.parse(response.SecretString);
   return JSON.parse(secretObject.firebaseServiceAccountKey);
 }
