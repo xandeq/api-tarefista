@@ -1,10 +1,28 @@
-const { Logtail } = require("@logtail/node");
-const logtail = new Logtail("C5n1RMdD8vaEpKm4DttLikQG", {
-  endpoint: "https://s1480127.eu-nbg-2.betterstackdata.com",
-});
+// Configuracao do Logtail/BetterStack vem exclusivamente do ambiente.
+// Nunca versionar o source token: quem tem o token consegue injetar logs na conta.
+const LOGTAIL_SOURCE_TOKEN = process.env.LOGTAIL_SOURCE_TOKEN;
+const LOGTAIL_ENDPOINT = process.env.LOGTAIL_ENDPOINT;
 
-logtail.error("Algo deu errado");
-logtail.info("Mensagem de log com dados estruturados", { item: "Teste", value: 100 });
-logtail.flush(); // opcional para garantir envio imediato
+let logger;
 
-module.exports = logtail;
+if (LOGTAIL_SOURCE_TOKEN) {
+  const { Logtail } = require("@logtail/node");
+  logger = new Logtail(
+    LOGTAIL_SOURCE_TOKEN,
+    LOGTAIL_ENDPOINT ? { endpoint: LOGTAIL_ENDPOINT } : undefined
+  );
+} else {
+  // Sem token configurado a aplicacao continua subindo, apenas sem envio remoto.
+  console.warn(
+    "[logger] LOGTAIL_SOURCE_TOKEN nao definido - usando console como fallback."
+  );
+  logger = {
+    debug: (...args) => console.debug(...args),
+    info: (...args) => console.log(...args),
+    warn: (...args) => console.warn(...args),
+    error: (...args) => console.error(...args),
+    flush: async () => {},
+  };
+}
+
+module.exports = logger;

@@ -1,0 +1,39 @@
+# Configuracao do gitleaks para api-tarefista.
+# Objetivo: impedir que segredos voltem a ser commitados (causa raiz do vazamento
+# do JWT_SECRET, do token do Logtail e dos logs de requisicoes).
+
+title = "api-tarefista gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Placeholders de documentacao e artefatos sem segredo real"
+
+paths = [
+  '''\.env\.example$''',
+  '''package-lock\.json$''',
+]
+
+regexes = [
+  # Placeholders explicitos usados em .env.example / README
+  '''REPLACE_ME''',
+  '''your[-_]?(secret|token|key)[-_]?here''',
+  '''(?i)changeme''',
+  '''<[A-Z_]+>''',
+]
+
+# Regra extra: o token do Logtail/BetterStack que estava hardcoded em logger.js
+# NAO e detectado pelo ruleset padrao (alfanumerico curto, sem prefixo).
+[[rules]]
+id = "logtail-source-token"
+description = "Logtail/BetterStack source token hardcoded"
+regex = '''(?i)new\s+Logtail\s*\(\s*["'][A-Za-z0-9]{16,64}["']'''
+tags = ["logtail", "betterstack", "token"]
+
+# Regra extra: segredo de assinatura de JWT atribuido literalmente no codigo.
+[[rules]]
+id = "hardcoded-jwt-secret"
+description = "JWT secret hardcoded no codigo"
+regex = '''(?i)(jwt[_-]?secret|token[_-]?secret)\s*[:=]\s*["'][A-Za-z0-9+/=_-]{16,}["']'''
+tags = ["jwt", "secret"]

@@ -28,7 +28,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
+# local env files (NUNCA versionar segredos)
+.env
+.env.*
+!.env.example
 .env*.local
 
 # typescript
@@ -36,3 +39,8 @@ yarn-error.*
 
 .aws-sam/
 .aws-sam
+
+# logs (podem conter tokens/PII de requisicoes reais)
+logs/
+*.log
+requests.log
